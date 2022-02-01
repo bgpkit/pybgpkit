@@ -12,4 +12,5 @@ Cargo.lock
 build
 dist
 *.egg-info
+.idea
 
