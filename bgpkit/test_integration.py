@@ -12,7 +12,7 @@ class TestIntegration(unittest.TestCase):
         assert len(elems) == 4227
 
     def test_broker(self):
-        broker = bgpkit.Broker(page_size=10)
+        broker = bgpkit.Broker()
         items = broker.query(start_ts=1634693400, end_ts=1634693400)
         for item in items:
             print(item)

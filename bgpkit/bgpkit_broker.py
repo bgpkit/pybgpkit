@@ -63,13 +63,6 @@ class Broker:
         res = requests.get(api_url).json()["data"]
         while res:
             if res["count"] > 0:
-                for item in res["items"]:
-                    data_items.append(BrokerItem(
-                        collector_id=item["collector_id"],
-                        data_type=item["data_type"],
-                        timestamp=item["timestamp"],
-                        url=item["url"],
-                    ))
                 data_items.extend([BrokerItem(**i) for i in res["items"]])
 
                 if res["count"] < res["page_size"]:

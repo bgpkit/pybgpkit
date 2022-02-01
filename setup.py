@@ -1,7 +1,7 @@
 import setuptools
 
 setuptools.setup(
-    name='bgpkit',
+    name='pybgpkit',
     version='0.0.1',
     description='BGPKIT tools Python bindings',
     url='https://github.com/bgpkit/pybgpkit',
