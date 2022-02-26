@@ -2,6 +2,7 @@ from dataclasses import dataclass
 
 import requests as requests
 
+
 def check_type(value: any, ty: type) -> bool:
     try:
         ty(value)
@@ -20,7 +21,7 @@ class BrokerItem:
 
 class Broker:
 
-    def __init__(self, api_url: str = "https://api.broker.bgpkit.com/v1", page_size: int=100):
+    def __init__(self, api_url: str = "https://api.broker.bgpkit.com/v1", page_size: int = 100):
         self.base_url = api_url.strip()
         self.page_size = int(page_size)
 
