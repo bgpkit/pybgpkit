@@ -56,7 +56,7 @@ Each returning item has the following field:
 
 ### BGPKIT Broker
 
-Origianl Rust version BGPKIT Broker code available at: <https://github.com/bgpkit/bgpkit-broker>
+Original Rust version BGPKIT Broker code available at: <https://github.com/bgpkit/bgpkit-broker>
 
 Example:
 ```python
@@ -80,4 +80,42 @@ Available fields:
   - `collector`: collector name, e.g. `rrc00` or `route-views2`
   - `data_type`: `rib` or `update`
   - `order`: order by timestamp, `asc` or `desc`, default
+  
+### BGPKIT ROAS Lookup
 
+BGPKIT ROAS lookup API provides lookup for historical RPKI ROAS data lookup. The following example shows a query that
+asks for all the validated ROA payload for RIPE NCC on the date of `2018-01-01`.
+
+```python
+import bgpkit
+roas = bgpkit.Roas()
+data = roas.query(debug=True, asn=3333, date="2018-01-01")
+for entry in data:
+    print(entry)
+assert len(data) == 10
+```
+
+``` 
+{'tal': 'ripencc', 'prefix': '193.0.0.0/21', 'asn': 3333, 'max_len': 21, 'date_ranges': [['2015-03-10', '2016-01-26'], ['2016-01-30', '2018-12-27'], ['2019-01-03', '2019-10-21'], ['2019-10-23', '2020-02-23'], ['2020-02-25', '2020-04-05'], ['2020-04-07', '2020-08-02'], ['2020-08-04', '2021-04-21'], ['2021-04-23', '2021-04-24'], ['2021-04-28', '2022-02-26']]}
+{'tal': 'ripencc', 'prefix': '193.0.10.0/23', 'asn': 3333, 'max_len': 23, 'date_ranges': [['2015-03-10', '2016-01-26'], ['2016-01-30', '2018-12-27'], ['2019-01-03', '2019-10-21'], ['2019-10-23', '2020-02-23'], ['2020-02-25', '2020-04-05'], ['2020-04-07', '2020-08-02'], ['2020-08-04', '2021-04-21'], ['2021-04-23', '2021-04-24'], ['2021-04-28', '2022-02-26']]}
+{'tal': 'ripencc', 'prefix': '193.0.12.0/23', 'asn': 3333, 'max_len': 23, 'date_ranges': [['2015-03-10', '2016-01-26'], ['2016-01-30', '2018-12-27'], ['2019-01-03', '2019-10-21'], ['2019-10-23', '2020-02-23'], ['2020-02-25', '2020-04-05'], ['2020-04-07', '2020-08-02'], ['2020-08-04', '2021-04-21'], ['2021-04-23', '2021-04-24'], ['2021-04-28', '2022-02-26']]}
+{'tal': 'ripencc', 'prefix': '193.0.18.0/23', 'asn': 3333, 'max_len': 23, 'date_ranges': [['2015-03-10', '2016-01-26'], ['2016-01-30', '2018-12-27'], ['2019-01-03', '2019-10-21'], ['2019-10-23', '2020-02-23'], ['2020-02-25', '2020-04-05'], ['2020-04-07', '2020-08-02'], ['2020-08-04', '2021-04-21'], ['2021-04-23', '2021-04-24'], ['2021-04-28', '2022-02-26']]}
+{'tal': 'ripencc', 'prefix': '193.0.20.0/23', 'asn': 3333, 'max_len': 23, 'date_ranges': [['2015-03-10', '2016-01-26'], ['2016-01-30', '2018-12-27'], ['2019-01-03', '2019-10-21'], ['2019-10-23', '2020-02-23'], ['2020-02-25', '2020-04-05'], ['2020-04-07', '2020-08-02'], ['2020-08-04', '2021-04-21'], ['2021-04-23', '2021-04-24'], ['2021-04-28', '2022-02-26']]}
+{'tal': 'ripencc', 'prefix': '193.0.22.0/23', 'asn': 3333, 'max_len': 23, 'date_ranges': [['2015-03-10', '2016-01-26'], ['2016-01-30', '2018-12-27'], ['2019-01-03', '2019-10-21'], ['2019-10-23', '2020-02-23'], ['2020-02-25', '2020-04-05'], ['2020-04-07', '2020-08-02'], ['2020-08-04', '2021-04-21'], ['2021-04-23', '2021-04-24'], ['2021-04-28', '2022-02-26']]}
+{'tal': 'ripencc', 'prefix': '193.0.24.0/22', 'asn': 3333, 'max_len': 26, 'date_ranges': [['2017-01-14', '2018-12-27'], ['2019-01-03', '2019-06-24']]}
+{'tal': 'ripencc', 'prefix': '193.0.24.0/24', 'asn': 3333, 'max_len': 24, 'date_ranges': [['2017-02-25', '2018-12-27'], ['2019-01-03', '2019-06-24']]}
+{'tal': 'ripencc', 'prefix': '2001:610:240::/42', 'asn': 3333, 'max_len': 42, 'date_ranges': [['2015-03-10', '2016-01-26'], ['2016-01-30', '2018-12-27'], ['2019-01-03', '2019-10-21'], ['2019-10-23', '2020-02-23'], ['2020-02-25', '2020-04-05'], ['2020-04-07', '2020-08-02'], ['2020-08-04', '2021-04-21'], ['2021-04-23', '2021-04-24'], ['2021-04-28', '2022-02-26']]}
+{'tal': 'ripencc', 'prefix': '2001:67c:2e8::/48', 'asn': 3333, 'max_len': 48, 'date_ranges': [['2015-03-10', '2016-01-26'], ['2016-01-30', '2018-12-27'], ['2019-01-03', '2019-10-21'], ['2019-10-23', '2020-02-23'], ['2020-02-25', '2020-04-05'], ['2020-04-07', '2020-08-02'], ['2020-08-04', '2021-04-21'], ['2021-04-23', '2021-04-24'], ['2021-04-28', '2022-02-26']]}
+```
+
+Available query fields:
+
+- `Roas()`
+  - `api_url`: the base URL for the BGPKIT ROAS instance. Default: `https://api.roas.bgpkit.com`
+- `query()`
+  - `prefix`: prefix to query in `str`
+  - `asn`: AS number to query in `int`
+  - `tal`: trust anchor to query in `str`, available values: `ripencc`, `arin`, `apnic`, `afrinic`, `lacnic`
+  - `date`: date to query, format: `YYYY-MM-DD`, e.g. `2022-01-01`
+  - `max_len`: filter results to only VRP's with specific max length
+  - `debug`: boolean toggle to display debug information, default `False`

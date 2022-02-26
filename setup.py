@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name='pybgpkit',
-    version='0.0.1',
+    version='0.0.2',
     description='BGPKIT tools Python bindings',
     url='https://github.com/bgpkit/pybgpkit',
     author='Mingwei Zhang',
@@ -12,6 +12,7 @@ setuptools.setup(
     install_requires=[
         # available on pip
         'pybgpkit-parser==0.0.1',
+        'requests',
     ],
     entry_points={'console_scripts': [
     ]}

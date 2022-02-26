@@ -13,11 +13,20 @@ class TestIntegration(unittest.TestCase):
 
     def test_broker(self):
         broker = bgpkit.Broker()
-        items = broker.query(start_ts=1634693400, end_ts=1634693400)
+        items = broker.query(start_ts=1643760000, end_ts=1643761200)
         for item in items:
             print(item)
         print(len(items))
         assert len(items) == 58
 
-        elems = bgpkit.Parser(items[0].url).parse_all()
-        assert len(elems) == 222467
+        # elems = bgpkit.Parser(items[0].url).parse_all()
+        # assert len(elems) == 222467
+
+    def test_roas(self):
+        roas = bgpkit.Roas()
+        data = roas.query(debug=True, asn=3333, date="2018-01-01")
+        for entry in data:
+            print(entry)
+        assert len(data) == 10
+
+        assert len(roas.query()) == 0
