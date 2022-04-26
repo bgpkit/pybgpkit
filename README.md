@@ -62,7 +62,7 @@ Example:
 ```python
 import bgpkit
 broker = bgpkit.Broker()
-items = broker.query(start_ts=1634693400, end_ts=1634693400)
+items = broker.query(ts_start="1634693400", ts_end="2021-10-20T01:30:00")
 for item in items:
     print(item)
 print(len(items))
@@ -72,14 +72,13 @@ assert len(items) == 58
 Available fields:
 
 - `Broker()`
-  - `api_url`: the base URL for the BGPKIT Broker instance. Default: `https://api.broker.bgpkit.com/v1`
+  - `api_url`: the base URL for the BGPKIT Broker instance. Default: `https://api.broker.bgpkit.com/v2`
   - `page_size`: the number of items per API call (no need to change it). Default: 100.
 - `query()`
-  - `start_ts`: start timestamp for MRT file, UNIX timestamp format
-  - `end_ts`: end timestamp for MRT file, UNIX timestamp format
+  - `ts_start`: start timestamp for MRT file, UNIX timestamp format
+  - `ts_end`: end timestamp for MRT file, UNIX timestamp format
   - `collector`: collector name, e.g. `rrc00` or `route-views2`
   - `data_type`: `rib` or `update`
-  - `order`: order by timestamp, `asc` or `desc`, default
   
 ### BGPKIT ROAS Lookup
 

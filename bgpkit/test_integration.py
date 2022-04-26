@@ -1,3 +1,4 @@
+import json
 import unittest
 
 import bgpkit
@@ -13,11 +14,11 @@ class TestIntegration(unittest.TestCase):
 
     def test_broker(self):
         broker = bgpkit.Broker()
-        items = broker.query(start_ts=1643760000, end_ts=1643761200)
+        items = broker.query(ts_start="1643760000", ts_end="2022-02-02T00:20:00")
         for item in items:
-            print(item)
+            print(json.dumps(item.__dict__))
         print(len(items))
-        assert len(items) == 58
+        assert len(items) == 290
 
         # elems = bgpkit.Parser(items[0].url).parse_all()
         # assert len(elems) == 222467
