@@ -43,7 +43,7 @@ class Broker:
             params.append(f"ts_end={ts_end}")
         if collector_id:
             check_type(collector_id, str)
-            params.append(f"collector={collector_id}")
+            params.append(f"collector_id={collector_id}")
         if project:
             check_type(project, str)
             params.append(f"project={project}")
