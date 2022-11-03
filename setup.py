@@ -7,7 +7,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setuptools.setup(
     name='pybgpkit',
-    version='0.2.1',
+    version='0.3.0',
     description='BGPKIT tools Python bindings',
     url='https://github.com/bgpkit/pybgpkit',
     author='Mingwei Zhang',
@@ -19,12 +19,7 @@ setuptools.setup(
     install_requires=[
         # available on pip
         'dataclasses_json',
-        'pybgpkit-parser==0.2.1',
+        'pybgpkit-parser==0.3.0',
         'requests',
-    ],
-    entry_points={
-        'console_scripts': [
-            "pybgpkit=bgpkit.cli:main"
-        ]
-    }
+    ]
 )

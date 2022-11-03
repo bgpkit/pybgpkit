@@ -14,3 +14,6 @@ dist
 *.egg-info
 .idea
 
+*.gz
+venv
+__pycache__
