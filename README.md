@@ -119,3 +119,21 @@ Available query fields:
   - `date`: date to query, format: `YYYY-MM-DD`, e.g. `2022-01-01`
   - `max_len`: filter results to only VRP's with specific max length
   - `debug`: boolean toggle to display debug information, default `False`
+
+## Build and Upload
+
+Install `python-build` module:
+``` bash
+python3 -m pip install build twine
+```
+
+Build current package:
+``` bash
+python3 -m build
+```
+
+Upload to PyPi (needs credentials)
+``` bash
+python3 -m twine upload dist/*
+```
+
