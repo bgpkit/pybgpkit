@@ -18,9 +18,9 @@ elems = parser.parse_all()
 assert len(elems) == 4227
 ```
 
-The `Parser` constructor takes two parameters:
+The `Parser` constructor takes the following parameters:
 - `url`: the URL or local file path toward an MRT file
-- `fitlers`: a dictionary of filters, available filters are:
+- `fitlers`: optional a dictionary of filters, available filters are:
   - `origin_asn`: origin AS number
   - `prefix`: exact match prefix
     - `prefix_super`: exact prefix and its super prefixes
@@ -33,6 +33,7 @@ The `Parser` constructor takes two parameters:
   - `ts_start`: start unix timestamp
   - `ts_end`: end unix timestamp
   - `as_path`: regular expression for AS path string
+- `cache_dir`: optional string for specifying a download cache directory
 
 
 Each returning item has the following field:
