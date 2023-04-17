@@ -33,7 +33,6 @@ class Broker:
             # if a user disable SSL verification on-purpose, do not warn the user
             urllib3.disable_warnings()
 
-
     def query(self,
               ts_start: str = None,
               ts_end: str = None,
