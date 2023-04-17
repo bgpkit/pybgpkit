@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
 import requests as requests
+import urllib3
 
 
 def check_type(value: any, ty: type) -> bool:
@@ -24,9 +25,13 @@ class BrokerItem:
 
 class Broker:
 
-    def __init__(self, api_url: str = "https://api.broker.bgpkit.com/v2", page_size: int = 100):
+    def __init__(self, api_url: str = "https://api.broker.bgpkit.com/v2", page_size: int = 100, verify=True):
         self.base_url = api_url.strip()
         self.page_size = int(page_size)
+        self.verify = verify
+        if not verify:
+            # if a user disable SSL verification on-purpose, do not warn the user
+            urllib3.disable_warnings()
 
     def query(self,
               ts_start: str = None,
@@ -58,7 +63,7 @@ class Broker:
         data_items = []
         if print_url:
             print(api_url)
-        res = requests.get(api_url).json()
+        res = requests.get(api_url, verify=self.verify).json()
         while res:
             if res["count"] > 0:
                 data_items.extend([BrokerItem(**i) for i in res["data"]])
@@ -70,7 +75,7 @@ class Broker:
                 query_url = f"{api_url}&page={page}"
                 if print_url:
                     print(query_url)
-                res = requests.get(query_url).json()
+                res = requests.get(query_url, verify=self.verify).json()
             else:
                 break
 
