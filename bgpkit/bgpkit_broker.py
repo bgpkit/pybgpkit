@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
 import requests as requests
+import urllib3
 
 
 def check_type(value: any, ty: type) -> bool:
@@ -28,6 +29,10 @@ class Broker:
         self.base_url = api_url.strip()
         self.page_size = int(page_size)
         self.verify = verify
+        if not verify:
+            # if a user disable SSL verification on-purpose, do not warn the user
+            urllib3.disable_warnings()
+
 
     def query(self,
               ts_start: str = None,

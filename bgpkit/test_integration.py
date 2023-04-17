@@ -31,6 +31,14 @@ class TestIntegration(unittest.TestCase):
         print(len(items))
         assert len(items) == 7
 
+    def test_broker_no_verify(self):
+        broker = bgpkit.Broker(verify=False)
+        items = broker.query(ts_start="1643760000", ts_end="2022-02-02T00:20:00", collector_id="rrc00")
+        for item in items:
+            print(json.dumps(item.__dict__))
+        print(len(items))
+        assert len(items) == 7
+
     def test_roas(self):
         roas = bgpkit.Roas()
         data = roas.query(debug=True, asn=3333, date="2018-01-01")
