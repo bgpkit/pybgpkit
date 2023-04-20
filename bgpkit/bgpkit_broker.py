@@ -25,7 +25,7 @@ class BrokerItem:
 
 class Broker:
 
-    def __init__(self, api_url: str = "https://api.broker.bgpkit.com/v2", page_size: int = 100, verify=True):
+    def __init__(self, api_url: str = "https://api.bgpkit.com/broker", page_size: int = 100, verify=True):
         self.base_url = api_url.strip()
         self.page_size = int(page_size)
         self.verify = verify
