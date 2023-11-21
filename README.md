@@ -7,15 +7,18 @@ repository at <https://github.com/bgpkit>.
 
 ### BGPKIT Parser
 
-Original Rust BGPKIT Parser code available at: <https://github.com/bgpkit/bgpkit-parser> 
+Original Rust BGPKIT Parser code available at: <https://github.com/bgpkit/bgpkit-parser-py> 
 
 Example:
 ```python
 import bgpkit
 parser = bgpkit.Parser(url="https://spaces.bgpkit.org/parser/update-example",
                        filters={"peer_ips": "185.1.8.65, 2001:7f8:73:0:3:fa4:0:1"})
-elems = parser.parse_all()
-assert len(elems) == 4227
+count = 0
+for elem in parser:
+  count += 1
+  print(elem)
+assert count == 4227
 ```
 
 The `Parser` constructor takes the following parameters:
