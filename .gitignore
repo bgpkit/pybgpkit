@@ -17,3 +17,7 @@ dist
 *.gz
 venv
 __pycache__
+
+.venv
+test*.py
+cache
