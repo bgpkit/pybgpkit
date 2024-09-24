@@ -79,8 +79,8 @@ Available fields:
   - `api_url`: the base URL for the BGPKIT Broker instance. Default: `https://api.broker.bgpkit.com/v2`
   - `page_size`: the number of items per API call (no need to change it). Default: 100.
 - `query()`
-  - `ts_start`: start timestamp for MRT file, UNIX timestamp format
-  - `ts_end`: end timestamp for MRT file, UNIX timestamp format
+  - `ts_start`: start timestamp for MRT file, UNIX timestamp or string format
+  - `ts_end`: end timestamp for MRT file, UNIX timestamp or string format
   - `collector_id`: collector name, e.g. `rrc00` or `route-views2`
   - `data_type`: `rib` or `update`
   
