@@ -81,7 +81,7 @@ Available fields:
 - `query()`
   - `ts_start`: start timestamp for MRT file, UNIX timestamp format
   - `ts_end`: end timestamp for MRT file, UNIX timestamp format
-  - `collector`: collector name, e.g. `rrc00` or `route-views2`
+  - `collector_id`: collector name, e.g. `rrc00` or `route-views2`
   - `data_type`: `rib` or `update`
   
 ### BGPKIT ROAS Lookup
