@@ -23,7 +23,7 @@ assert count == 4227
 
 The `Parser` constructor takes the following parameters:
 - `url`: the URL or local file path toward an MRT file
-- `fitlers`: optional a dictionary of filters, available filters are:
+- `filters`: optional a dictionary of filters, available filters are:
   - `origin_asn`: origin AS number
   - `prefix`: exact match prefix
     - `prefix_super`: exact prefix and its super prefixes
