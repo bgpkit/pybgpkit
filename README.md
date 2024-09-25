@@ -23,7 +23,7 @@ assert count == 4227
 
 The `Parser` constructor takes the following parameters:
 - `url`: the URL or local file path toward an MRT file
-- `fitlers`: optional a dictionary of filters, available filters are:
+- `filters`: optional a dictionary of filters, available filters are:
   - `origin_asn`: origin AS number
   - `prefix`: exact match prefix
     - `prefix_super`: exact prefix and its super prefixes
@@ -79,9 +79,9 @@ Available fields:
   - `api_url`: the base URL for the BGPKIT Broker instance. Default: `https://api.broker.bgpkit.com/v2`
   - `page_size`: the number of items per API call (no need to change it). Default: 100.
 - `query()`
-  - `ts_start`: start timestamp for MRT file, UNIX timestamp format
-  - `ts_end`: end timestamp for MRT file, UNIX timestamp format
-  - `collector`: collector name, e.g. `rrc00` or `route-views2`
+  - `ts_start`: start timestamp for MRT file, UNIX timestamp or string format
+  - `ts_end`: end timestamp for MRT file, UNIX timestamp or string format
+  - `collector_id`: collector name, e.g. `rrc00` or `route-views2`
   - `data_type`: `rib` or `update`
   
 ### BGPKIT ROAS Lookup
