@@ -137,6 +137,6 @@ python3 -m build
 
 Upload to PyPi (needs credentials)
 ``` bash
-python3 -m twine upload dist/*
+python3 -m twine upload --skip-existing dist/*
 ```
 
