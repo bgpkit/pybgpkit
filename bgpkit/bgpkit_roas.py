@@ -1,80 +1,64 @@
 from dataclasses import dataclass
-from typing import Optional, List
+from typing import List, Optional
 
-import requests as requests
-
-
-def check_type(value: any, ty: type) -> bool:
-    try:
-        ty(value)
-        return True
-    except ValueError:
-        raise ValueError("invalid option input")
+import requests
 
 
 @dataclass
 class RoasItem:
     prefix: str
     asn: int
-    tal: str
-    date_ranges: List[List[str]]
-
-
-@dataclass
-class RoasRes:
-    limit: int
-    count: int
-    data: List[RoasItem]
-    next_page_num: Optional[int]
-    next_page: Optional[str]
-    error: Optional[str]
+    max_len: Optional[int] = None
+    tal: Optional[str] = None
+    current: bool = False
+    date_ranges: Optional[List[List[str]]] = None
 
 
 class Roas:
+    """BGPKIT ROAS lookup (alpha API).
 
-    def __init__(self, api_url: str = "https://api.roas.bgpkit.com"):
-        self.base_url = api_url.strip()
+    Queries the ROAS (Route Origination Authorization) database
+    for historical and current RPKI data.
+    """
 
-    def query(self,
-              prefix: str = None,
-              asn: int = None,
-              tal: str = None,
-              date: str = None,
-              max_len: int = None,
-              debug: bool = False,
-              ) -> [RoasItem]:
+    def __init__(self, api_url: str = "https://alpha.api.bgpkit.com"):
+        self.base_url = api_url.rstrip("/")
 
-        if not (prefix or asn or tal or date or max_len):
-            print("ERROR: must specify at least one query parameter: prefix, asn, tal, date, max_len")
-            return []
+    def query(
+        self,
+        asn: int = None,
+        prefix: str = None,
+        date: str = None,
+        current: bool = None,
+        page: int = 1,
+        page_size: int = None,
+    ) -> List[RoasItem]:
+        """Query ROAS database.
 
-        params = []
+        Args:
+            asn: AS number to filter by.
+            prefix: IP prefix to filter by.
+            date: Date string (YYYY-MM-DD) for historical lookup.
+            current: If True, return only currently valid ROAs.
+            page: Page number (1-indexed).
+            page_size: Results per page. Defaults to 5 (alpha API limitation).
+
+        Returns:
+            List of RoasItem matching the query.
+        """
+        params = {}
+        if asn is not None:
+            params["asn"] = asn
         if prefix:
-            check_type(prefix, str)
-            params.append(f"prefix={prefix}")
-        if asn:
-            check_type(asn, int)
-            params.append(f"asn={asn}")
-        if tal:
-            check_type(tal, str)
-            params.append(f"tal={tal}")
+            params["prefix"] = prefix
         if date:
-            check_type(date, str)
-            params.append(f"date={date}")
-        if max_len:
-            check_type(max_len, int)
-            params.append(f"max_len={max_len}")
+            params["date"] = date
+        if current is not None:
+            params["current"] = str(current).lower()
+        params["page"] = str(page)
+        params["page_size"] = str(page_size if page_size is not None else 5)
 
-        api_url = f"{self.base_url}/lookup?" + "&".join(params)
-        data_items = []
-        if debug:
-            print(api_url)
-        res = RoasRes(**requests.get(api_url).json())
-        while res.data:
-            data_items.extend(res.data)
-            if res.next_page:
-                res = RoasRes(**requests.get(res.next_page).json())
-            else:
-                break
-
-        return data_items
+        res = requests.get(f"{self.base_url}/roas", params=params).json()
+        if isinstance(res, list):
+            return [RoasItem(**item) for item in res]
+        return [RoasItem(**item) for item in res.get("data", [])]

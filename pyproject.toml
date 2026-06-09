@@ -1,6 +1,35 @@
 [build-system]
-requires = [
-    "setuptools>=42",
-    "wheel"
-]
+requires = ["setuptools>=42", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "pybgpkit"
+dynamic = []
+version = "0.7.0"
+description = "BGPKIT tools Python bindings"
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+authors = [
+    { name = "Mingwei Zhang", email = "mingwei@bgpkit.com" },
+]
+classifiers = [
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+dependencies = [
+    "pybgpkit-parser>=0.7.0",
+    "requests",
+]
+
+[project.urls]
+Homepage = "https://github.com/bgpkit/pybgpkit"
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[tool.setuptools.packages.find]
+include = ["bgpkit*"]

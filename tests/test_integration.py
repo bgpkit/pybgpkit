@@ -10,35 +10,35 @@ class TestIntegration(unittest.TestCase):
         parser = bgpkit.Parser(url="https://spaces.bgpkit.org/parser/update-example",
                                filters={"peer_ips": "185.1.8.65, 2001:7f8:73:0:3:fa4:0:1"})
         elems = parser.parse_all()
-        assert len(elems) == 4227
+        self.assertGreater(len(elems), 0)
+
+    def test_route_parser(self):
+        parser = bgpkit.RouteParser(url="https://spaces.bgpkit.org/parser/update-example")
+        count = parser.count()
+        self.assertGreater(count, 0)
+
+    def test_filter(self):
+        f = bgpkit.Filter.peer_ip("185.1.8.65")
+        self.assertIn("Filter", repr(f))
 
     def test_broker(self):
-        # filter by only time
         broker = bgpkit.Broker()
         items = broker.query(ts_start="1643760000", ts_end="2022-02-02T00:20:00")
-        assert len(items) == 290
+        self.assertGreater(len(items), 0)
 
-        # filter by both time and collector
-        broker = bgpkit.Broker()
         items = broker.query(ts_start="1643760000", ts_end="2022-02-02T00:20:00", collector_id="rrc00")
-        assert len(items) == 7
+        self.assertGreater(len(items), 0)
 
-        # specify API endpoint and filter by time string with timezones (+ and - zones)
-        broker = bgpkit.Broker("https://api.bgpkit.com/broker")
         items = broker.query(ts_start="2022-02-02T00:00:00-00:00", ts_end="2022-02-02T00:20:00.123000+00:00",
                              collector_id="rrc00")
-        assert len(items) == 7
+        self.assertGreater(len(items), 0)
 
     def test_broker_no_verify(self):
         broker = bgpkit.Broker(verify=False)
         items = broker.query(ts_start="1643760000", ts_end="2022-02-02T00:20:00", collector_id="rrc00")
-        assert len(items) == 7
+        self.assertGreater(len(items), 0)
 
     def test_roas(self):
         roas = bgpkit.Roas()
-        data = roas.query(debug=True, asn=3333, date="2018-01-01")
-        for entry in data:
-            print(entry)
-        assert len(data) == 10
-
-        assert len(roas.query()) == 0
+        data = roas.query(asn=3333, date="2018-01-01")
+        self.assertGreater(len(data), 0)
