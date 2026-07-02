@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "pybgpkit"
 dynamic = []
-version = "0.7.0"
+version = "0.8.0"
 description = "BGPKIT tools Python bindings"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -21,7 +21,7 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
-    "pybgpkit-parser>=0.7.0",
+    "pybgpkit-parser>=0.18.0",
     "requests",
 ]
 

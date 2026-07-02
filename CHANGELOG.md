@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## v0.8.0 - 2026-07-02
+
+### Highlights
+
+* Update `pybgpkit-parser` dependency to `>=0.18.0`.
+
 ## v0.7.0 - 2026-06-09
 
 ### Highlights
