@@ -1,17 +1,13 @@
 import json
 import os
-from dataclasses import dataclass, fields
+from dataclasses import dataclass
 from typing import List, Optional
 
-import requests as requests
 import urllib3
 
+from ._utils import DEFAULT_TIMEOUT, BGPKITApiError, from_item, request_json
+
 DEFAULT_API_URL = "https://api.bgpkit.com/v3/broker"
-DEFAULT_TIMEOUT = 30.0
-
-
-class BrokerApiError(RuntimeError):
-    """Raised when a broker API request fails or returns an error response."""
 
 
 def check_type(value: any, ty: type) -> bool:
@@ -20,12 +16,6 @@ def check_type(value: any, ty: type) -> bool:
         return True
     except (ValueError, TypeError):
         raise ValueError("invalid option input")
-
-
-def _from_item(cls, item: dict):
-    """Build a dataclass from an API item, ignoring unknown fields."""
-    names = {field.name for field in fields(cls)}
-    return cls(**{key: value for key, value in item.items() if key in names})
 
 
 @dataclass
@@ -98,21 +88,12 @@ class Broker:
 
     def _request(self, endpoint: str, params: Optional[dict] = None) -> dict:
         """Make a single request and return the parsed JSON body."""
-        url = f"{self.base_url}/{endpoint}"
-        response = requests.get(
-            url,
-            params=params or {},
+        return request_json(
+            f"{self.base_url}/{endpoint}",
+            params=params,
             verify=self.verify,
             timeout=self.timeout,
         )
-        if response.status_code >= 400:
-            raise BrokerApiError(
-                f"GET {url} failed with HTTP {response.status_code}: {response.text[:200]}"
-            )
-        try:
-            return response.json()
-        except ValueError as error:
-            raise BrokerApiError(f"GET {url} returned a non-JSON response") from error
 
     def _paginate(self, endpoint: str, params: dict) -> dict:
         """Fetch every page of a paginated broker endpoint.
@@ -174,12 +155,12 @@ class Broker:
             params["data_type"] = data_type
 
         result = self._paginate("search", params)
-        return [_from_item(BrokerItem, item) for item in result.get("data", [])]
+        return [from_item(BrokerItem, item) for item in result.get("data", [])]
 
     def latest(self) -> List[BrokerItem]:
         """Get the latest MRT data file for every collector and data type."""
         result = self._request("latest")
-        return [_from_item(BrokerItem, item) for item in result.get("data", [])]
+        return [from_item(BrokerItem, item) for item in result.get("data", [])]
 
     def peers(
         self,
@@ -200,7 +181,7 @@ class Broker:
             params["collector"] = collector
 
         result = self._request("peers", params)
-        return [_from_item(PeerItem, item) for item in result.get("data", [])]
+        return [from_item(PeerItem, item) for item in result.get("data", [])]
 
     def collectors(
         self,
@@ -218,4 +199,4 @@ class Broker:
             params["active"] = str(active).lower()
 
         result = self._request("collectors", params)
-        return [_from_item(CollectorItem, item) for item in result.get("data", [])]
+        return [from_item(CollectorItem, item) for item in result.get("data", [])]

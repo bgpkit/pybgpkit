@@ -5,8 +5,8 @@ import os
 import unittest
 from unittest import mock
 
-from bgpkit import Broker, BrokerItem, CollectorItem, PeerItem
-from bgpkit.bgpkit_broker import DEFAULT_API_URL, BrokerApiError
+from bgpkit import BGPKITApiError, Broker, BrokerItem, CollectorItem, PeerItem
+from bgpkit.bgpkit_broker import DEFAULT_API_URL
 
 
 class FakeResponse:
@@ -22,7 +22,7 @@ class FakeResponse:
 
 
 def mock_get(*responses):
-    return mock.patch("bgpkit.bgpkit_broker.requests.get", side_effect=list(responses))
+    return mock.patch("bgpkit._utils.requests.get", side_effect=list(responses))
 
 
 LATEST_PAYLOAD = {
@@ -210,7 +210,7 @@ class TestBrokerQuery(unittest.TestCase):
 
     def test_raises_on_http_error(self):
         with mock_get(FakeResponse({"error": "boom"}, status_code=500)):
-            with self.assertRaises(BrokerApiError) as context:
+            with self.assertRaises(BGPKITApiError) as context:
                 Broker().query(collector_id="rrc00")
         self.assertIn("HTTP 500", str(context.exception))
 
