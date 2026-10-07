@@ -58,8 +58,10 @@ ASN_PAYLOAD = {
 
 class TestAsnLookup(unittest.TestCase):
     def test_parses_nested_asn_item(self):
-        with mock_get(FakeResponse(ASN_PAYLOAD)):
+        with mock_get(FakeResponse(ASN_PAYLOAD)) as get:
             result = AsnLookup().query(asn="15169")
+        # the v3 ASN endpoint uses a 0-indexed page parameter
+        self.assertEqual(get.call_args.kwargs["params"]["page"], 0)
         self.assertEqual(result.count, 1)
         info = result.data[0]
         self.assertIsInstance(info, AsnInfo)

@@ -54,7 +54,7 @@ class AsnLookup:
         asn: str = None,
         country: str = None,
         search: str = None,
-        page: int = 1,
+        page: int = 0,
         page_size: int = 100,
     ) -> AsnLookupResult:
         """Look up ASN information.
@@ -63,7 +63,7 @@ class AsnLookup:
             asn: AS number, or a comma-separated list of AS numbers.
             country: Filter by ISO country code.
             search: Free-text search over ASN names and organizations.
-            page: Page number (1-indexed).
+            page: Page number to start from (0-indexed).
             page_size: Results per page.
 
         Returns:
@@ -76,7 +76,7 @@ class AsnLookup:
             params["country"] = country
         if search:
             params["search"] = search
-        if page:
+        if page is not None:
             params["page"] = page
         if page_size:
             params["page_size"] = min(page_size, 10000)

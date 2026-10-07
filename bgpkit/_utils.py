@@ -25,7 +25,10 @@ def request_json(
     timeout: float = DEFAULT_TIMEOUT,
 ) -> dict:
     """GET a JSON API endpoint, raising BGPKITApiError on failures."""
-    response = requests.get(url, params=params or {}, verify=verify, timeout=timeout)
+    try:
+        response = requests.get(url, params=params or {}, verify=verify, timeout=timeout)
+    except requests.RequestException as error:
+        raise BGPKITApiError(f"GET {url} failed: {error}") from error
     if response.status_code >= 400:
         raise BGPKITApiError(
             f"GET {url} failed with HTTP {response.status_code}: {response.text[:200]}"
