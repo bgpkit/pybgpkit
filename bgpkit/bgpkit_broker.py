@@ -1,8 +1,17 @@
-from dataclasses import dataclass, field
+import json
+import os
+from dataclasses import dataclass, fields
 from typing import List, Optional
 
 import requests as requests
 import urllib3
+
+DEFAULT_API_URL = "https://api.bgpkit.com/v3/broker"
+DEFAULT_TIMEOUT = 30.0
+
+
+class BrokerApiError(RuntimeError):
+    """Raised when a broker API request fails or returns an error response."""
 
 
 def check_type(value: any, ty: type) -> bool:
@@ -11,6 +20,12 @@ def check_type(value: any, ty: type) -> bool:
         return True
     except (ValueError, TypeError):
         raise ValueError("invalid option input")
+
+
+def _from_item(cls, item: dict):
+    """Build a dataclass from an API item, ignoring unknown fields."""
+    names = {field.name for field in fields(cls)}
+    return cls(**{key: value for key, value in item.items() if key in names})
 
 
 @dataclass
@@ -22,31 +37,37 @@ class BrokerItem:
     url: str
     rough_size: int
     exact_size: int
+    delay: Optional[float] = None  # seconds since the latest catalog update; /latest items only
 
 
 @dataclass
 class PeerItem:
+    date: str
+    collector: str
     ip: str
     asn: int
-    collector: str
-    full_feed: bool = False
+    num_v4_pfxs: int
+    num_v6_pfxs: int
+    num_connected_asns: int
+
+    @property
+    def full_feed(self) -> bool:
+        """True for full-table peers (>700k IPv4 or >100k IPv6 prefixes)."""
+        return self.num_v4_pfxs > 700_000 or self.num_v6_pfxs > 100_000
 
 
 @dataclass
 class CollectorItem:
-    id: str
     name: str
     project: str
+    data_url: str
+    activated_on: str
+    deactivated_on: Optional[str]
     country: str
-    active: bool = True
-    latitude: Optional[float] = None
-    longitude: Optional[float] = None
 
-
-@dataclass
-class LatestResult:
-    """Result of the /v3/broker/latest endpoint."""
-    items: List[BrokerItem] = field(default_factory=list)
+    @property
+    def active(self) -> bool:
+        return self.deactivated_on is None
 
 
 class Broker:
@@ -54,48 +75,78 @@ class Broker:
 
     Provides access to MRT data file search, peer information,
     collector metadata, and latest file discovery.
+
+    The API base URL can be overridden per instance with ``api_url`` or for the
+    whole process with the ``BGPKIT_BROKER_URL`` environment variable.
     """
 
     def __init__(
         self,
-        api_url: str = "https://api.bgpkit.com/v3/broker",
+        api_url: Optional[str] = None,
         page_size: int = 100,
         verify: bool = True,
+        timeout: float = DEFAULT_TIMEOUT,
     ):
+        if api_url is None:
+            api_url = os.environ.get("BGPKIT_BROKER_URL") or DEFAULT_API_URL
         self.base_url = api_url.rstrip("/")
         self.page_size = int(page_size)
         self.verify = verify
+        self.timeout = timeout
         if not verify:
             urllib3.disable_warnings()
 
+    def _request(self, endpoint: str, params: Optional[dict] = None) -> dict:
+        """Make a single request and return the parsed JSON body."""
+        url = f"{self.base_url}/{endpoint}"
+        response = requests.get(
+            url,
+            params=params or {},
+            verify=self.verify,
+            timeout=self.timeout,
+        )
+        if response.status_code >= 400:
+            raise BrokerApiError(
+                f"GET {url} failed with HTTP {response.status_code}: {response.text[:200]}"
+            )
+        try:
+            return response.json()
+        except ValueError as error:
+            raise BrokerApiError(f"GET {url} returned a non-JSON response") from error
+
     def _paginate(self, endpoint: str, params: dict) -> dict:
-        """Fetch all pages of a paginated broker endpoint."""
+        """Fetch every page of a paginated broker endpoint.
+
+        Stops when the reported total is reached, or when a page adds no new
+        items. The latter also terminates endpoints that ignore pagination
+        parameters instead of looping on the same full page forever.
+        """
         page = 1
-        all_data = []
-
+        all_data: List[dict] = []
+        seen = set()
+        result = {}
         while True:
-            params["page"] = page
-            params["page_size"] = self.page_size
-            res = requests.get(
-                f"{self.base_url}/{endpoint}",
-                params=params,
-                verify=self.verify,
-            ).json()
+            page_params = dict(params)
+            page_params["page"] = page
+            page_params["page_size"] = self.page_size
 
-            if isinstance(res, dict):
-                data = res.get("data", [])
-                all_data.extend(data)
-                if len(data) < self.page_size:
-                    break
-            elif isinstance(res, list):
-                all_data.extend(res)
-                break
-            else:
-                break
+            result = self._request(endpoint, page_params)
+            data = result.get("data", [])
+            new_items = []
+            for item in data:
+                key = json.dumps(item, sort_keys=True, default=str)
+                if key not in seen:
+                    seen.add(key)
+                    new_items.append(item)
+            all_data.extend(new_items)
 
+            total = result.get("total")
+            if not data or not new_items:
+                break
+            if total is not None and len(all_data) >= int(total):
+                break
             page += 1
 
-        result = res if isinstance(res, dict) else {"data": all_data}
         result["data"] = all_data
         return result
 
@@ -123,18 +174,12 @@ class Broker:
             params["data_type"] = data_type
 
         result = self._paginate("search", params)
-        return [BrokerItem(**item) for item in result.get("data", [])]
+        return [_from_item(BrokerItem, item) for item in result.get("data", [])]
 
     def latest(self) -> List[BrokerItem]:
-        """Get latest MRT data files across projects."""
-        res = requests.get(
-            f"{self.base_url}/latest",
-            verify=self.verify,
-        ).json()
-        if isinstance(res, list):
-            return [BrokerItem(**item) for item in res]
-        data = res.get("data", [])
-        return [BrokerItem(**item) for item in data]
+        """Get the latest MRT data file for every collector and data type."""
+        result = self._request("latest")
+        return [_from_item(BrokerItem, item) for item in result.get("data", [])]
 
     def peers(
         self,
@@ -154,8 +199,8 @@ class Broker:
         if collector:
             params["collector"] = collector
 
-        result = self._paginate("peers", params)
-        return [PeerItem(**item) for item in result.get("data", [])]
+        result = self._request("peers", params)
+        return [_from_item(PeerItem, item) for item in result.get("data", [])]
 
     def collectors(
         self,
@@ -172,5 +217,5 @@ class Broker:
         if active is not None:
             params["active"] = str(active).lower()
 
-        result = self._paginate("collectors", params)
-        return [CollectorItem(**item) for item in result.get("data", [])]
+        result = self._request("collectors", params)
+        return [_from_item(CollectorItem, item) for item in result.get("data", [])]
