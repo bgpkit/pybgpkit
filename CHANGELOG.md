@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## v0.10.0 - 2026-11-06
+
+### Highlights
+
+* Raise the `pybgpkit-parser` requirement to `>=0.24.0`, which builds on `bgpkit-parser` v0.24.0. Parsed update files now report the withdrawals the older parser dropped from messages whose withdrawn list starts with a default route, so per-file element counts can be higher than with v0.9.0.
+
 ## v0.9.0 - 2026-10-07
 
 ### Highlights
